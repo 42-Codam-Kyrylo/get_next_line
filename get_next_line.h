@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:23:21 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/12 18:55:46 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/12 20:54:17 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@
 
 char	*get_next_line(int fd);
 void	ft_strlcpy(char *dst, const char *src, size_t size);
-char	*ft_strdup(const char *s, size_t duplicate_len);
+char	*ft_strdup(const char *s);
+size_t	ft_strlen(const char *s);
+size_t	ft_strlcat(char *dst, const char *src, size_t size);
 
 #endif
