@@ -31,11 +31,11 @@ Test(get_next_line_test, read_whole_file)
 	char *got5 = get_next_line(fd);
 	close(fd);
 
-	cr_assert_str_eq(got1, "Hello world! line1\n", "Line 1 mismatch");
-	cr_assert_str_eq(got2, "line2\n", "Line 2 mismatch");
-	cr_assert_str_eq(got3, "line 3 line 3 line 3\n", "Line 3 mismatch");
-	cr_assert_str_eq(got4, "last line!", "Line 4 mismatch (no newline at EOF)");
-	cr_assert_null(got5, "Should return NULL after EOF");
+	cr_assert_str_eq(got1, "Hello world! line1\n", "Line 1:\n  got: %s\n  want: %s", got1, "Hello world! line1\n");
+	cr_assert_str_eq(got2, "line2\n", "Line 2:\n  got: %s\n  want: %s", got2, "line2\n");
+	cr_assert_str_eq(got3, "line 3 line 3 line 3\n", "Line 3:\n  got: %s\n  want: %s", got3, "line 3 line 3 line 3\n");
+	cr_assert_str_eq(got4, "last line!", "Line 4:\n  got: %s\n  want: %s", got4, "last line!");
+	cr_assert_null(got5, "Line 5:\n  got: %s\n  want: NULL", got5);
 	
 	free(got1);
 	free(got2);
