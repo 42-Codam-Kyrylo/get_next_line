@@ -18,7 +18,7 @@
 
 char	*get_next_line(int fd)
 {
-	if(!fd || BUFFER_SIZE < 0)
+	if(fd < 0 || BUFFER_SIZE < 0)
 		return NULL;
 
 	static char *rest_buffer;
@@ -28,11 +28,13 @@ char	*get_next_line(int fd)
 	bool is_next_line_rb = is_string_contain_character(rest_buffer, '\n');
 	if(is_next_line_rb) {
 		next_line = line_before_character(rest_buffer, '\n');
-		rest_buffer = ft_strchr(rest_buffer, '\n');
+		char *temp = ft_strdup( ft_strchr(rest_buffer, '\n'));
+		free(rest_buffer);
+		rest_buffer = temp;
 		return next_line;
 	}
 
-	buffer = malloc(BUFFER_SIZE);
+	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer) 
 		return NULL;
 	
@@ -43,16 +45,25 @@ char	*get_next_line(int fd)
 		return NULL;
 	}
 
+	buffer[read_result] = '\0';
+
 	if(read_result == 0) {
 		next_line = ft_strdup(rest_buffer);
 		free(buffer);
-		// free(rest_buffer);
+		free(rest_buffer);
+		rest_buffer = NULL;
 		return next_line;
 	}
 
 	bool is_next_line_in_buffer = is_string_contain_character(buffer, '\n');
 	if (!is_next_line_in_buffer) {
-		rest_buffer = ft_strdup(buffer);
+		if (rest_buffer) {
+			char *temp = ft_strjoin(rest_buffer, buffer);
+			free(rest_buffer);
+			rest_buffer = temp;
+		} else {
+			rest_buffer = ft_strdup(buffer);
+		}
 		free(buffer);
 		return NULL;
 	}
@@ -60,12 +71,17 @@ char	*get_next_line(int fd)
 	next_line = line_before_character(buffer, '\n');
 	
 	if(!rest_buffer) {
-		rest_buffer = ft_strchr(buffer, '\n');
+		rest_buffer = ft_strdup(ft_strchr(buffer, '\n'));
+		free(buffer);
 		return next_line;
 	}
 
+	char *old_next_line = next_line;
 	next_line = ft_strjoin(rest_buffer, next_line);
-	rest_buffer = ft_strchr(buffer, '\n');
+	free(old_next_line);
+	free(rest_buffer);
+	rest_buffer = ft_strdup(ft_strchr(buffer, '\n'));
+	free(buffer);
 	return next_line;
 }
 /**
