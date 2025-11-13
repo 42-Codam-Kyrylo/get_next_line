@@ -15,7 +15,7 @@
 
 int main(int argc, char **argv)
 {
-    const char *path = (argc > 1) ? argv[1] : "tests/file1.txt"; // файл лежит в папке tests
+    const char *path = (argc > 1) ? argv[1] : "tests/only_newlines.txt"; 
     int fd = open(path, O_RDONLY);
 
     if (fd == -1)
@@ -24,41 +24,35 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Reading whole file test (path=%s):\n", path);
+    printf("Testing only_newlines (path=%s):\n", path);
     printf("----------------------------------\n");
 
-    char *got1 = get_next_line(fd);
-    printf("Line 1: %s", got1 ? got1 : "NULL\n");
-    if (got1 && got1[strlen(got1) - 1] != '\n')
-        printf("\n");
-
-    char *got2 = get_next_line(fd);
-    printf("Line 2: %s", got2 ? got2 : "NULL\n");
-    if (got2 && got2[strlen(got2) - 1] != '\n')
-        printf("\n");
-
-    char *got3 = get_next_line(fd);
-    printf("Line 3: %s", got3 ? got3 : "NULL\n");
-    if (got3 && got3[strlen(got3) - 1] != '\n')
-        printf("\n");
-
-    char *got4 = get_next_line(fd);
-    printf("Line 4: %s", got4 ? got4 : "NULL\n");
-    if (got4 && got4[strlen(got4) - 1] != '\n')
-        printf("\n");
-
-    char *got5 = get_next_line(fd);
-    printf("Line 5: %s", got5 ? got5 : "NULL\n");
-    if (got5 && got5[strlen(got5) - 1] != '\n')
-        printf("\n");
-
+    char *line1 = get_next_line(fd);
+    char *line2 = get_next_line(fd);
+    char *line3 = get_next_line(fd);
+    char *line4 = get_next_line(fd);
+    char *line5 = get_next_line(fd);
     close(fd);
 
-    free(got1);
-    free(got2);
-    free(got3);
-    free(got4);
-    free(got5);
+    printf("line1: %s", line1 ? (strcmp(line1, "\n") == 0 ? "\"\\n\" ✓\n" : line1) : "NULL ✗\n");
+    printf("line2: %s", line2 ? (strcmp(line2, "\n") == 0 ? "\"\\n\" ✓\n" : line2) : "NULL ✗\n");
+    printf("line3: %s", line3 ? (strcmp(line3, "\n") == 0 ? "\"\\n\" ✓\n" : line3) : "NULL ✗\n");
+    printf("line4: %s", line4 ? (strcmp(line4, "\n") == 0 ? "\"\\n\" ✓\n" : line4) : "NULL ✗\n");
+    printf("line5: %s", line5 ? "NOT NULL ✗\n" : "NULL ✓\n");
+
+    printf("\n----------------------------------\n");
+    printf("Expected: 4 newlines, then NULL\n");
+    printf("Result: %s\n", 
+           (line1 && strcmp(line1, "\n") == 0 &&
+            line2 && strcmp(line2, "\n") == 0 &&
+            line3 && strcmp(line3, "\n") == 0 &&
+            line4 && strcmp(line4, "\n") == 0 &&
+            line5 == NULL) ? "PASSED ✓" : "FAILED ✗");
+
+    free(line1);
+    free(line2);
+    free(line3);
+    free(line4);
 
     return 0;
 }

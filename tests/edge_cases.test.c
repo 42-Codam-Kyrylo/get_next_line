@@ -44,7 +44,7 @@ Test(edge_cases, only_newlines)
 	cr_assert_str_eq(line2, "\n", "Second empty line");
 	cr_assert_str_eq(line3, "\n", "Third empty line");
 	cr_assert_str_eq(line4, "\n", "Fourth empty line");
-	cr_assert_null(line5, "Should return NULL after all lines");
+	cr_assert_null(line5, "Should return NULL after all lines, got: %s", line5 ? line5 : "NULL");
 	
 	free(line1);
 	free(line2);
