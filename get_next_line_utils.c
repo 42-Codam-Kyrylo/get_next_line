@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:12 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/12 20:54:10 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/13 15:50:47 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,4 +74,41 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 	}
 	dst[dst_len + i] = '\0';
 	return (src_len + dst_len);
+}
+
+char	*ft_strchr(const char *s, int c)
+{
+	int	i;
+
+	if(!s)
+		return NULL;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == (char)c)
+		{
+			return ((char *)(s + i));
+		}
+		i++;
+	}
+	if (s[i] == (char)c)
+		return ((char *)(s + i));
+	return (NULL);
+}
+
+char	*ft_strjoin(char const *s1, char const *s2)
+{
+	size_t	str1_len;
+	size_t	str2_len;
+	char	*result;
+
+	str1_len = ft_strlen(s1);
+	str2_len = ft_strlen(s2);
+	result = (char *)malloc((str1_len + str2_len + 1) * sizeof(char));
+	if (result == NULL)
+		return (NULL);
+	ft_strlcpy(result, s1, (str1_len + str2_len + 1));
+	ft_strlcat(result, s2, (str1_len + str2_len + 1));
+	return (result);
 }

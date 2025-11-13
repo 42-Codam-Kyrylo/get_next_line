@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:23:21 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/12 20:54:17 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/13 17:25:48 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define GET_NEXT_LINE_H
 
 # include <string.h>
+#include <stdbool.h>
 
 # ifndef BUFFER_SIZE
 #  define BUFFER_SIZE 10
@@ -24,5 +25,9 @@ void	ft_strlcpy(char *dst, const char *src, size_t size);
 char	*ft_strdup(const char *s);
 size_t	ft_strlen(const char *s);
 size_t	ft_strlcat(char *dst, const char *src, size_t size);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strjoin(char const *s1, char const *s2);
+char *line_before_character(char *str, int c);
+bool is_string_contain_character(char *str, int c);
 
 #endif
