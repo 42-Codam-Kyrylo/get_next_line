@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/13 17:30:03 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/13 17:57:06 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@ char	*get_next_line(int fd)
 	static char *rest_buffer;
 	char *buffer;
 	char *next_line;
-	
-	
+
 	bool is_next_line_rb = is_string_contain_character(rest_buffer, '\n');
 	if(is_next_line_rb) {
 		next_line = line_before_character(rest_buffer, '\n');
@@ -45,9 +44,9 @@ char	*get_next_line(int fd)
 	}
 
 	if(read_result == 0) {
-		next_line = ft_strjoin(rest_buffer, "\n");
+		next_line = ft_strdup(rest_buffer);
 		free(buffer);
-		free(rest_buffer);
+		// free(rest_buffer);
 		return next_line;
 	}
 

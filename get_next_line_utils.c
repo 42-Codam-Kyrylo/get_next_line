@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:12 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/13 15:50:47 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/13 17:50:51 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,13 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 	return (src_len + dst_len);
 }
 
+/**
+ * @brief returns string after c NOT INCLUDED C
+ * 
+ * @param s 
+ * @param c 
+ * @return char* 
+ */
 char	*ft_strchr(const char *s, int c)
 {
 	int	i;
@@ -88,7 +95,7 @@ char	*ft_strchr(const char *s, int c)
 	{
 		if (s[i] == (char)c)
 		{
-			return ((char *)(s + i));
+			return ((char *)(s + i + 1));
 		}
 		i++;
 	}
