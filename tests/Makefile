@@ -3,7 +3,12 @@
 # **************************************************************************** #
 
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -D BUFFER_SIZE=1
+# Default flags; BUFFER_SIZE can be overridden: `make test BUFFER_SIZE=42`
+CFLAGS      = -Wall -Wextra -Werror
+
+# BUFFER_SIZE control (default 1)
+BUFFER_SIZE ?= 42
+CFLAGS     += -D BUFFER_SIZE=$(BUFFER_SIZE)
 
 # Пути
 ROOT_DIR    = ..
@@ -52,6 +57,19 @@ else
 	@$(COMPILE_FILE)
 	@$(RUN_TESTS)
 endif
+
+# Run the full test suite for multiple BUFFER_SIZE values
+SIZES ?= 1 5 42 1000
+
+test-all:
+	@echo "🧪 Running tests for BUFFER_SIZE values: $(SIZES)"
+	@for sz in $(SIZES); do \
+		echo "\n=============================="; \
+		echo "BUFFER_SIZE=$$sz"; \
+		echo "=============================="; \
+		$(MAKE) --no-print-directory clean >/dev/null; \
+		$(MAKE) --no-print-directory test BUFFER_SIZE=$$sz FILE="$(FILE)" VERBOSE="$(VERBOSE)"; \
+		done
 
 show: VERBOSE=--verbose
 show: test

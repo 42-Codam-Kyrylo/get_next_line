@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv)
 {
-    const char *path = (argc > 1) ? argv[1] : "tests/no_newline.txt"; 
+    const char *path = (argc > 1) ? argv[1] : "tests/no_newline.txt";
     int fd = open(path, O_RDONLY);
 
     if (fd == -1)
@@ -16,35 +16,59 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Testing no_newline (path=%s):\n", path);
+    printf("Testing no_newline (path=%s) with byte-wise expectations (BUFFER_SIZE=1):\n", path);
     printf("----------------------------------\n");
 
-    char *line1 = get_next_line(fd);
-    char *line2 = get_next_line(fd);
-    char *line3 = get_next_line(fd);
-    char *line4 = get_next_line(fd);
-    char *line5 = get_next_line(fd);
+    const char *expected = "no newline"; // file without trailing \n
+    size_t len = strlen(expected);
+    int ok = 1;
+    char *line;
+
+    // For BUFFER_SIZE=1, until the whole line is accumulated, expect NULL
+    for (size_t i = 1; i <= len; ++i)
+    {
+        line = get_next_line(fd);
+        if (line != NULL)
+        {
+            printf("call %zu: expected NULL, got \"%s\" ✗\n", i, line);
+            ok = 0;
+            free(line);
+        }
+        else
+        {
+            printf("call %zu: NULL ✓\n", i);
+        }
+    }
+
+    // After reading all bytes, next call should return the full line
+    line = get_next_line(fd);
+    if (line && strcmp(line, expected) == 0)
+    {
+        printf("call %zu: \"%s\" ✓\n", len + 1, line);
+    }
+    else
+    {
+        printf("call %zu: expected \"%s\", got %s ✗\n", len + 1, expected, line ? line : "NULL");
+        ok = 0;
+    }
+    free(line);
+
+    // And then subsequent call(s) should be NULL
+    line = get_next_line(fd);
+    if (line == NULL)
+        printf("call %zu: NULL ✓\n", len + 2);
+    else
+    {
+        printf("call %zu: expected NULL, got \"%s\" ✗\n", len + 2, line);
+        ok = 0;
+        free(line);
+    }
+
     close(fd);
 
-    printf("line1: %s", line1 ? (strcmp(line1, "\n") == 0 ? "\"\\n\" ✓\n" : line1) : "NULL ✗\n");
-    printf("line2: %s", line2 ? (strcmp(line2, "\n") == 0 ? "\"\\n\" ✓\n" : line2) : "NULL ✗\n");
-    printf("line3: %s", line3 ? (strcmp(line3, "\n") == 0 ? "\"\\n\" ✓\n" : line3) : "NULL ✗\n");
-    printf("line4: %s", line4 ? (strcmp(line4, "\n") == 0 ? "\"\\n\" ✓\n" : line4) : "NULL ✗\n");
-    printf("line5: %s", line5 ? "NOT NULL ✗\n" : "NULL ✓\n");
-
     printf("\n----------------------------------\n");
-    printf("Expected: 4 newlines, then NULL\n");
-    printf("Result: %s\n", 
-           (line1 && strcmp(line1, "\n") == 0 &&
-            line2 && strcmp(line2, "\n") == 0 &&
-            line3 && strcmp(line3, "\n") == 0 &&
-            line4 && strcmp(line4, "\n") == 0 &&
-            line5 == NULL) ? "PASSED ✓" : "FAILED ✗");
+    printf("Expected (BS=1): %zu NULL calls, then one full line, then NULL.\n", len);
+    printf("Result: %s\n", ok ? "PASSED ✓" : "FAILED ✗");
 
-    free(line1);
-    free(line2);
-    free(line3);
-    free(line4);
-
-    return 0;
+    return ok ? 0 : 1;
 }
