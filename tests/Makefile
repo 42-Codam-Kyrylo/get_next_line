@@ -3,7 +3,7 @@
 # **************************************************************************** #
 
 CC          = gcc
-CFLAGS      = -Wall -Wextra -Werror -D BUFFER_SIZE=42
+CFLAGS      = -Wall -Wextra -Werror -D BUFFER_SIZE=1
 
 # Пути
 ROOT_DIR    = ..

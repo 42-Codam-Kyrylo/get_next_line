@@ -6,15 +6,18 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/13 17:57:06 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/15 12:57:10 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdlib.h>
 #include <unistd.h>
-#include "stdio.h"
+#include <stdio.h>
 #include <stdbool.h>
+
+#define Log(fmt, ...) \
+    printf("[%s] [%s] [Line %d]: " fmt "\n", __FILE__, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 char	*get_next_line(int fd)
 {

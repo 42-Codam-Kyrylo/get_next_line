@@ -1,8 +1,7 @@
 {
-	"editor.defaultFormatter": "keyhr.42-c-format",
+	"editor.defaultFormatter": "ms-vscode.cpptools",
 	"files.associations": {
 		"get_next_line.h": "c",
 		"stdlib.h": "c"
 	},
-	"workbench.colorTheme": "Default Dark Modern"
 }

@@ -1,11 +1,3 @@
-// main.c — ручной тест для функции get_next_line.
-// Запускает несколько последовательных чтений, имитируя тест read_whole_file.
-// Советы по отладке:
-// 1. Поставь breakpoint внутри get_next_line (например, на первую строку функции).
-// 2. F5 (конфигурация "Debug get_next_line").
-// 3. Смотри переменные: buffer, rest_buffer, read_result.
-// 4. Используй Step Over (F10) / Step Into (F11).
-
 #include "get_next_line.h"
 #include <fcntl.h>
 #include <unistd.h>
@@ -15,7 +7,7 @@
 
 int main(int argc, char **argv)
 {
-    const char *path = (argc > 1) ? argv[1] : "tests/only_newlines.txt"; 
+    const char *path = (argc > 1) ? argv[1] : "tests/no_newline.txt"; 
     int fd = open(path, O_RDONLY);
 
     if (fd == -1)
@@ -24,7 +16,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    printf("Testing only_newlines (path=%s):\n", path);
+    printf("Testing no_newline (path=%s):\n", path);
     printf("----------------------------------\n");
 
     char *line1 = get_next_line(fd);
