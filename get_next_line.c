@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/16 14:26:47 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/16 14:44:30 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,10 @@ char	*get_next_line(int fd)
 	
 	if(read_result < 0) {
 		free(buffer);
+		if (rest_buffer) {
+			free(rest_buffer);
+			rest_buffer = NULL;
+		}
 		return NULL;
 	}
 
