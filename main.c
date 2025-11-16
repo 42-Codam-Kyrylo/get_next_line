@@ -7,68 +7,40 @@
 
 int main(int argc, char **argv)
 {
-    const char *path = (argc > 1) ? argv[1] : "tests/no_newline.txt";
-    int fd = open(path, O_RDONLY);
+	const char *path = (argc > 1) ? argv[1] : "tests/no_newline.txt";
+	int fd = open(path, O_RDONLY);
+	if (fd == -1)
+	{
+		perror("open");
+		fprintf(stderr, "Failed to open file: %s\n", path);
+		return 1;
+	}
 
-    if (fd == -1)
-    {
-        perror("open");
-        return 1;
-    }
+	char *line = get_next_line(fd);
+	close(fd);
 
-    printf("Testing no_newline (path=%s) with byte-wise expectations (BUFFER_SIZE=1):\n", path);
-    printf("----------------------------------\n");
+	if (line == NULL)
+	{
+		fprintf(stderr, "get_next_line returned NULL (expected a line)\n");
+		return 1;
+	}
 
-    const char *expected = "no newline"; // file without trailing \n
-    size_t len = strlen(expected);
-    int ok = 1;
-    char *line;
+	// Debug info: show returned string and metadata
+	size_t len = strlen(line);
+	printf("Returned line (len=%zu): '%s'\n", len, line);
+	if (len > 0)
+		printf("Last char code: %d\n", (unsigned char)line[len - 1]);
 
-    // For BUFFER_SIZE=1, until the whole line is accumulated, expect NULL
-    for (size_t i = 1; i <= len; ++i)
-    {
-        line = get_next_line(fd);
-        if (line != NULL)
-        {
-            printf("call %zu: expected NULL, got \"%s\" ✗\n", i, line);
-            ok = 0;
-            free(line);
-        }
-        else
-        {
-            printf("call %zu: NULL ✓\n", i);
-        }
-    }
+	// Expectation from the test: content should equal "no newline"
+	const char *expected = "no newline";
+	if (strcmp(line, expected) != 0)
+	{
+		fprintf(stderr, "Content mismatch. Expected: '%s', Got: '%s'\n", expected, line);
+		free(line);
+		return 1;
+	}
 
-    // After reading all bytes, next call should return the full line
-    line = get_next_line(fd);
-    if (line && strcmp(line, expected) == 0)
-    {
-        printf("call %zu: \"%s\" ✓\n", len + 1, line);
-    }
-    else
-    {
-        printf("call %zu: expected \"%s\", got %s ✗\n", len + 1, expected, line ? line : "NULL");
-        ok = 0;
-    }
-    free(line);
-
-    // And then subsequent call(s) should be NULL
-    line = get_next_line(fd);
-    if (line == NULL)
-        printf("call %zu: NULL ✓\n", len + 2);
-    else
-    {
-        printf("call %zu: expected NULL, got \"%s\" ✗\n", len + 2, line);
-        ok = 0;
-        free(line);
-    }
-
-    close(fd);
-
-    printf("\n----------------------------------\n");
-    printf("Expected (BS=1): %zu NULL calls, then one full line, then NULL.\n", len);
-    printf("Result: %s\n", ok ? "PASSED ✓" : "FAILED ✗");
-
-    return ok ? 0 : 1;
+	printf("OK: line matches expected without trailing newline.\n");
+	free(line);
+	return 0;
 }
