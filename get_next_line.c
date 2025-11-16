@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/16 14:44:30 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/16 14:51:04 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 
 char	*get_next_line(int fd)
 {
-	if(fd < 0 || BUFFER_SIZE < 0)
+	if(fd < 0 || BUFFER_SIZE <= 0)
 		return NULL;
 
 	static char *rest_buffer;
@@ -31,7 +31,13 @@ char	*get_next_line(int fd)
 	bool is_next_line_rb = is_string_contain_character(rest_buffer, '\n');
 	if(is_next_line_rb) {
 		next_line = line_before_character(rest_buffer, '\n');
-		char *temp = ft_strdup( ft_strchr(rest_buffer, '\n'));
+		if (!next_line)
+			return NULL;
+		char *temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
+		if (!temp) {
+			free(next_line);
+			return NULL;
+		}
 		free(rest_buffer);
 		rest_buffer = temp;
 		return next_line;
@@ -78,6 +84,10 @@ char	*get_next_line(int fd)
 		}
 		free(buffer);
 
+		/* Allocation failed while accumulating; propagate NULL safely */
+		if (!rest_buffer)
+			return NULL;
+
 		if(read_result < BUFFER_SIZE) {
 			next_line = rest_buffer;
 			rest_buffer = NULL;
@@ -88,20 +98,42 @@ char	*get_next_line(int fd)
 	}
 
 	next_line = line_before_character(buffer, '\n');
+	if (!next_line) {
+		free(buffer);
+		return NULL;
+	}
 	
 	if(!rest_buffer) {
-		rest_buffer = ft_strdup(ft_strchr(buffer, '\n'));
+		char *dup = ft_strdup(ft_strchr(buffer, '\n'));
+		if (!dup) {
+			free(next_line);
+			free(buffer);
+			return NULL;
+		}
+		rest_buffer = dup;
 		free(buffer);
 		return next_line;
 	}
 
 	char *old_next_line = next_line;
-	next_line = ft_strjoin(rest_buffer, next_line);
+	char *joined = ft_strjoin(rest_buffer, next_line);
+	if (!joined) {
+		free(old_next_line);
+		/* keep rest_buffer unchanged on failure */
+		free(buffer);
+		return NULL;
+	}
 	free(old_next_line);
+	char *dup = ft_strdup(ft_strchr(buffer, '\n'));
+	if (!dup) {
+		free(joined);
+		free(buffer);
+		return NULL;
+	}
 	free(rest_buffer);
-	rest_buffer = ft_strdup(ft_strchr(buffer, '\n'));
+	rest_buffer = dup;
 	free(buffer);
-	return next_line;
+	return joined;
 }
 /**
  * @brief returns string before character included character
