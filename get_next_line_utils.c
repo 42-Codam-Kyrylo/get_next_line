@@ -110,6 +110,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	size_t	str2_len;
 	char	*result;
 
+	if (!s1 || !s2)
+		return (NULL);
 	str1_len = ft_strlen(s1);
 	str2_len = ft_strlen(s2);
 	result = (char *)malloc((str1_len + str2_len + 1) * sizeof(char));

@@ -38,6 +38,11 @@ TEST_BIN    = test_gnl
 VERBOSE     ?= 
 FILE        ?= 
 
+# Valgrind configuration (override from CLI if desired):
+#   make valgrind VG_OPTS="--leak-check=full --track-origins=yes" FILE=edge_cases.test.c
+VALGRIND    ?= valgrind
+VG_OPTS     ?= --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1
+
 COMPILE_ALL  = $(CC) $(CFLAGS) $(TEST_SRC) $(GNL_SRC) -I $(ROOT_DIR) $(CRIT_INC) $(CRIT_LIB) -o $(TEST_BIN)
 COMPILE_FILE = $(CC) $(CFLAGS) $(FILE) $(GNL_SRC) -I $(ROOT_DIR) $(CRIT_INC) $(CRIT_LIB) -o $(TEST_BIN)
 RUN_TESTS    = $(LD_PATH) ./$(TEST_BIN) $(VERBOSE)
@@ -78,6 +83,29 @@ test-list:
 	@echo "📋 Listing available tests..."
 	@$(COMPILE_ALL)
 	@$(LD_PATH) ./$(TEST_BIN) --list
+
+# ---------------------------------------------------------------------------- #
+# Valgrind targets                                                              #
+# ---------------------------------------------------------------------------- #
+
+valgrind:
+	@echo "🕵️ Running Valgrind (BUFFER_SIZE=$(BUFFER_SIZE))..."
+ifeq ($(FILE),)
+	@$(COMPILE_ALL)
+else
+	@$(COMPILE_FILE)
+endif
+	@$(LD_PATH) $(VALGRIND) $(VG_OPTS) ./$(TEST_BIN) $(VERBOSE)
+
+valgrind-all:
+	@echo "🧪 Running Valgrind across BUFFER_SIZE values: $(SIZES)"
+	@for sz in $(SIZES); do \
+		echo "\n=============================="; \
+		echo "Valgrind BUFFER_SIZE=$$sz"; \
+		echo "=============================="; \
+		$(MAKE) --no-print-directory clean >/dev/null; \
+		$(MAKE) --no-print-directory valgrind BUFFER_SIZE=$$sz FILE="$(FILE)" VERBOSE="$(VERBOSE)" VG_OPTS="$(VG_OPTS)"; \
+	 done
 
 clean:
 	@rm -f $(TEST_BIN)

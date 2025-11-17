@@ -6,7 +6,7 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/16 14:51:04 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/17 16:43:28 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,6 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdbool.h>
-
-#define Log(fmt, ...) \
-    printf("[%s] [%s] [Line %d]: " fmt "\n", __FILE__, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
 
 char	*get_next_line(int fd)
 {
@@ -31,11 +28,16 @@ char	*get_next_line(int fd)
 	bool is_next_line_rb = is_string_contain_character(rest_buffer, '\n');
 	if(is_next_line_rb) {
 		next_line = line_before_character(rest_buffer, '\n');
-		if (!next_line)
+		if (!next_line) {
+			free(rest_buffer);
+			rest_buffer = NULL;
 			return NULL;
+		}
 		char *temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
 		if (!temp) {
 			free(next_line);
+			free(rest_buffer);
+			rest_buffer = NULL;
 			return NULL;
 		}
 		free(rest_buffer);
@@ -44,8 +46,13 @@ char	*get_next_line(int fd)
 	}
 
 	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer) 
+	if (!buffer) {
+		if (rest_buffer) {
+			free(rest_buffer);
+			rest_buffer = NULL;
+		}
 		return NULL;
+	}
 	
 	int read_result = read(fd, buffer, BUFFER_SIZE);
 	
@@ -63,6 +70,12 @@ char	*get_next_line(int fd)
 	if(read_result == 0) {
 		if(rest_buffer && rest_buffer[0] != '\0') {
 			next_line = ft_strdup(rest_buffer);
+			if(!next_line) {
+				free(buffer);
+				free(rest_buffer);
+				rest_buffer = NULL;
+				return NULL;
+			}
 		} else {
 			next_line = NULL;
 		}
@@ -77,14 +90,23 @@ char	*get_next_line(int fd)
 		
 		if (rest_buffer) {
 			char *temp = ft_strjoin(rest_buffer, buffer);
+			if(!temp) {
+				free(buffer);
+				free(rest_buffer);
+				rest_buffer = NULL;
+				return NULL;
+			}
 			free(rest_buffer);
 			rest_buffer = temp;
 		} else {
 			rest_buffer = ft_strdup(buffer);
+			if (!rest_buffer) {
+				free(buffer);
+				return NULL;
+			}
 		}
 		free(buffer);
 
-		/* Allocation failed while accumulating; propagate NULL safely */
 		if (!rest_buffer)
 			return NULL;
 
@@ -100,6 +122,8 @@ char	*get_next_line(int fd)
 	next_line = line_before_character(buffer, '\n');
 	if (!next_line) {
 		free(buffer);
+		free(rest_buffer);
+		rest_buffer = NULL;
 		return NULL;
 	}
 	
@@ -119,8 +143,9 @@ char	*get_next_line(int fd)
 	char *joined = ft_strjoin(rest_buffer, next_line);
 	if (!joined) {
 		free(old_next_line);
-		/* keep rest_buffer unchanged on failure */
 		free(buffer);
+		free(rest_buffer);
+		rest_buffer = NULL;
 		return NULL;
 	}
 	free(old_next_line);
@@ -128,6 +153,8 @@ char	*get_next_line(int fd)
 	if (!dup) {
 		free(joined);
 		free(buffer);
+		free(rest_buffer);
+		rest_buffer = NULL;
 		return NULL;
 	}
 	free(rest_buffer);
