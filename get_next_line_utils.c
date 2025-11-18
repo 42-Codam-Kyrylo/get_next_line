@@ -15,7 +15,8 @@
 
 void	ft_strlcpy(char *dst, const char *src, size_t size)
 {
-	size_t i;
+	size_t	i;
+
 	i = 0;
 	while (i < size - 1 && src[i])
 	{
@@ -25,47 +26,46 @@ void	ft_strlcpy(char *dst, const char *src, size_t size)
 	dst[i] = '\0';
 }
 
+/**
+ * @brief
+ *
+ * @param s
+ * @return char*
+ * @warning FREE
+ */
 char	*ft_strdup(const char *s)
 {
 	char	*duplicate;
 	size_t	duplicate_len;
 
+	duplicate_len = 0;
 	if (!s)
 		return (NULL);
-	duplicate_len = ft_strlen(s) + 1;
+	while (s[duplicate_len])
+		duplicate_len++;
+	duplicate_len += 1;
 	duplicate = (char *)malloc(duplicate_len * sizeof(char));
 	if (duplicate == NULL)
 		return (NULL);
 	ft_strlcpy(duplicate, s, duplicate_len);
 	return (duplicate);
 }
-
-size_t	ft_strlen(const char *s)
-{
-	int	i;
-
-	i = 0;
-	while (s[i])
-	{
-		i++;
-	}
-	return (i);
-}
-
 size_t	ft_strlcat(char *dst, const char *src, size_t size)
 {
 	size_t	i;
 	size_t	src_len;
 	size_t	dst_len;
 
-	src_len = ft_strlen(src);
-	dst_len = ft_strlen(dst);
+	src_len = 0;
+	dst_len = 0;
+	while (src[src_len])
+		src_len++;
+	while (dst[dst_len])
+		dst_len++;
 	if (size == 0)
 		return (src_len);
 	if (dst_len >= size)
-	{
 		return (size + src_len);
-	}
 	i = 0;
 	while (src[i] && i < size - dst_len - 1)
 	{
@@ -78,18 +78,17 @@ size_t	ft_strlcat(char *dst, const char *src, size_t size)
 
 /**
  * @brief returns string after c NOT INCLUDED C
- * 
- * @param s 
- * @param c 
- * @return char* 
+ *
+ * @param s
+ * @param c
+ * @return char*
  */
 char	*ft_strchr(const char *s, int c)
 {
 	int	i;
 
-	if(!s)
-		return NULL;
-
+	if (!s)
+		return (NULL);
 	i = 0;
 	while (s[i])
 	{
@@ -104,16 +103,28 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
+/**
+ * @brief
+ *
+ * @param s1
+ * @param s2
+ * @return char*
+ * @warning FREE
+ */
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	size_t	str1_len;
 	size_t	str2_len;
 	char	*result;
 
+	str1_len = 0;
+	str2_len = 0;
 	if (!s1 || !s2)
 		return (NULL);
-	str1_len = ft_strlen(s1);
-	str2_len = ft_strlen(s2);
+	while (s1[str1_len])
+		str1_len++;
+	while (s2[str2_len])
+		str2_len++;
 	result = (char *)malloc((str1_len + str2_len + 1) * sizeof(char));
 	if (result == NULL)
 		return (NULL);
