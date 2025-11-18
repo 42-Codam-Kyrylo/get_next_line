@@ -16,92 +16,95 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+char	*handle_buffer_new_line(char **next_line, char **buffer,
+		char **rest_buffer)
+{
+	char	*joined;
+	char	*dup;
+
+	*next_line = line_before_character(*buffer, '\n');
+	if (!*next_line)
+		return (free(*buffer), free(*rest_buffer), *rest_buffer = NULL, NULL);
+	if (!*rest_buffer)
+	{
+		dup = ft_strdup(ft_strchr(*buffer, '\n'));
+		if (!dup)
+			return (free(*next_line), free(*buffer), NULL);
+		return (*rest_buffer = dup, free(*buffer), *next_line);
+	}
+	joined = ft_strjoin(*rest_buffer, *next_line);
+	if (!joined)
+		return (free(*next_line), free(*buffer), free(*rest_buffer),
+			*rest_buffer = NULL, NULL);
+	free(*next_line);
+	dup = ft_strdup(ft_strchr(*buffer, '\n'));
+	if (!dup)
+		return (free(joined), free(*buffer), free(*rest_buffer),
+			*rest_buffer = NULL, NULL);
+	return (free(*rest_buffer), *rest_buffer = dup, free(*buffer), joined);
+}
+
 char	*process_read(int fd, char **rest_buffer)
 {
 	char	*buffer;
 	int		read_result;
 	char	*next_line;
-	char	*dup;
 	char	*joined;
 
-	while (1)
+	buffer = malloc(BUFFER_SIZE + 1);
+	if (!buffer)
 	{
-		buffer = malloc(BUFFER_SIZE + 1);
-		if (!buffer)
-		{
-			if (*rest_buffer)
-				free(*rest_buffer), *rest_buffer = NULL;
-			return (NULL);
-		}
-		read_result = read(fd, buffer, BUFFER_SIZE);
-		if (read_result < 0)
-		{
-			if (*rest_buffer)
-				free(*rest_buffer), *rest_buffer = NULL;
-			return (free(buffer), NULL);
-		}
-		buffer[read_result] = '\0';
-		if (read_result == 0)
-		{
-			if (*rest_buffer && *rest_buffer[0] != '\0')
-			{
-				next_line = ft_strdup(*rest_buffer);
-				if (!next_line)
-					return (free(buffer), free(*rest_buffer),
-						*rest_buffer = NULL, NULL);
-			}
-			else
-				next_line = NULL;
-			return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
-				next_line);
-		}
-		if (!ft_strchr(buffer, '\n'))
-		{
-			if (*rest_buffer)
-			{
-				joined = ft_strjoin(*rest_buffer, buffer);
-				if (!joined)
-					return (free(buffer), free(*rest_buffer),
-						*rest_buffer = NULL, NULL);
-				free(*rest_buffer);
-				*rest_buffer = joined;
-			}
-			else
-			{
-				*rest_buffer = ft_strdup(buffer);
-				if (!*rest_buffer)
-					return (free(buffer), NULL);
-			}
-			free(buffer);
-			if (!*rest_buffer)
-				return (NULL);
-			if (read_result < BUFFER_SIZE)
-				return (next_line = *rest_buffer, *rest_buffer = NULL,
-					next_line);
-			return (get_next_line(fd));
-		}
-		next_line = line_before_character(buffer, '\n');
-		if (!next_line)
-			return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
-				NULL);
-		if (!*rest_buffer)
-		{
-			dup = ft_strdup(ft_strchr(buffer, '\n'));
-			if (!dup)
-				return (free(next_line), free(buffer), NULL);
-			return (*rest_buffer = dup, free(buffer), next_line);
-		}
-		joined = ft_strjoin(*rest_buffer, next_line);
-		if (!joined)
-			return (free(next_line), free(buffer), free(*rest_buffer),
-				*rest_buffer = NULL, NULL);
-		free(next_line);
-		dup = ft_strdup(ft_strchr(buffer, '\n'));
-		if (!dup)
-			return (free(joined), free(buffer), free(*rest_buffer),
-				*rest_buffer = NULL, NULL);
-		return (free(*rest_buffer), *rest_buffer = dup, free(buffer), joined);
+		if (*rest_buffer)
+			free(*rest_buffer), *rest_buffer = NULL;
+		return (NULL);
 	}
+	read_result = read(fd, buffer, BUFFER_SIZE);
+	if (read_result < 0)
+	{
+		if (*rest_buffer)
+			free(*rest_buffer), *rest_buffer = NULL;
+		return (free(buffer), NULL);
+	}
+	buffer[read_result] = '\0';
+	if (read_result == 0)
+	{
+		if (*rest_buffer && *rest_buffer[0] != '\0')
+		{
+			next_line = ft_strdup(*rest_buffer);
+			if (!next_line)
+				return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
+					NULL);
+		}
+		else
+			next_line = NULL;
+		return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
+			next_line);
+	}
+	if (!ft_strchr(buffer, '\n'))
+	{
+		if (*rest_buffer)
+		{
+			joined = ft_strjoin(*rest_buffer, buffer);
+			if (!joined)
+				return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
+					NULL);
+			free(*rest_buffer);
+			*rest_buffer = joined;
+		}
+		else
+		{
+			*rest_buffer = ft_strdup(buffer);
+			if (!*rest_buffer)
+				return (free(buffer), NULL);
+		}
+		free(buffer);
+		if (!*rest_buffer)
+			return (NULL);
+		if (read_result < BUFFER_SIZE)
+			return (next_line = *rest_buffer, *rest_buffer = NULL, next_line);
+		return (get_next_line(fd));
+	}
+	return (handle_buffer_new_line(&next_line, &buffer, rest_buffer));
 }
 
 char	*get_next_line(int fd)
