@@ -104,6 +104,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	result[i + j] = '\0';
 	return (result);
 }
+
 /**
  * @brief returns string before character included character
  *
