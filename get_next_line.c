@@ -16,15 +16,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void	ft_free(char **str)
-{
-	if (str && *str)
-	{
-		free(*str);
-		*str = NULL;
-	}
-}
-
 char	*get_next_line(int fd)
 {
 	static char	*rest_buffer;
@@ -42,24 +33,24 @@ char	*get_next_line(int fd)
 	{
 		next_line = line_before_character(rest_buffer, '\n');
 		if (!next_line)
-			return (ft_free(&rest_buffer), NULL);
+			return (free(rest_buffer), rest_buffer= NULL, NULL);
 		temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
 		if (!temp)
-			return (free(next_line), ft_free(&rest_buffer), NULL);
+			return (free(next_line), free(rest_buffer), rest_buffer= NULL, NULL);
 		return (free(rest_buffer), rest_buffer = temp, next_line);
 	}
 	buffer = malloc(BUFFER_SIZE + 1);
 	if (!buffer)
 	{
 		if (rest_buffer)
-			ft_free(&rest_buffer);
+			free(rest_buffer), rest_buffer= NULL;
 		return (NULL);
 	}
 	read_result = read(fd, buffer, BUFFER_SIZE);
 	if (read_result < 0)
 	{
 		if (rest_buffer)
-			ft_free(&rest_buffer);
+			free(rest_buffer), rest_buffer= NULL;
 		return (free(buffer), NULL);
 	}
 	buffer[read_result] = '\0';
@@ -69,11 +60,11 @@ char	*get_next_line(int fd)
 		{
 			next_line = ft_strdup(rest_buffer);
 			if (!next_line)
-				return (free(buffer), ft_free(&rest_buffer), NULL);
+				return (free(buffer), free(rest_buffer), rest_buffer= NULL, NULL);
 		}
 		else
 			next_line = NULL;
-		return (free(buffer), ft_free(&rest_buffer), next_line);
+		return (free(buffer), free(rest_buffer), rest_buffer= NULL, next_line);
 	}
 	if (!ft_strchr(buffer, '\n'))
 	{
@@ -81,7 +72,7 @@ char	*get_next_line(int fd)
 		{
 			temp = ft_strjoin(rest_buffer, buffer);
 			if (!temp)
-				return (free(buffer), ft_free(&rest_buffer), NULL);
+				return (free(buffer), free(rest_buffer), rest_buffer= NULL, NULL);
 			free(rest_buffer);
 			rest_buffer = temp;
 		}
@@ -100,7 +91,7 @@ char	*get_next_line(int fd)
 	}
 	next_line = line_before_character(buffer, '\n');
 	if (!next_line)
-		return (free(buffer), ft_free(&rest_buffer), NULL);
+		return (free(buffer), free(rest_buffer), rest_buffer= NULL, NULL);
 	if (!rest_buffer)
 	{
 		dup = ft_strdup(ft_strchr(buffer, '\n'));
@@ -111,11 +102,11 @@ char	*get_next_line(int fd)
 	old_next_line = next_line;
 	joined = ft_strjoin(rest_buffer, next_line);
 	if (!joined)
-		return (free(old_next_line), free(buffer), ft_free(&rest_buffer), NULL);
+		return (free(old_next_line), free(buffer), free(rest_buffer), rest_buffer= NULL, NULL);
 	free(old_next_line);
 	dup = ft_strdup(ft_strchr(buffer, '\n'));
 	if (!dup)
-		return (free(joined), free(buffer), ft_free(&rest_buffer), NULL);
+		return (free(joined), free(buffer), free(rest_buffer), rest_buffer= NULL, NULL);
 	return (free(rest_buffer), rest_buffer = dup, free(buffer), joined);
 }
 
