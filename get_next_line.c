@@ -6,207 +6,166 @@
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/17 16:43:28 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/18 19:52:56 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdbool.h>
+
+void	ft_free(char **str)
+{
+	if (str && *str)
+	{
+		free(*str);
+		*str = NULL;
+	}
+}
 
 char	*get_next_line(int fd)
 {
-	if(fd < 0 || BUFFER_SIZE <= 0)
-		return NULL;
+	static char	*rest_buffer;
+	char		*buffer;
+	char		*next_line;
+	char		*temp;
+	int			read_result;
+	char		*dup;
+	char		*old_next_line;
+	char		*joined;
 
-	static char *rest_buffer;
-	char *buffer;
-	char *next_line;
-
-	bool is_next_line_rb = is_string_contain_character(rest_buffer, '\n');
-	if(is_next_line_rb) {
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	if (is_string_contain_character(rest_buffer, '\n'))
+	{
 		next_line = line_before_character(rest_buffer, '\n');
-		if (!next_line) {
-			free(rest_buffer);
-			rest_buffer = NULL;
-			return NULL;
-		}
-		char *temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
-		if (!temp) {
-			free(next_line);
-			free(rest_buffer);
-			rest_buffer = NULL;
-			return NULL;
-		}
-		free(rest_buffer);
-		rest_buffer = temp;
-		return next_line;
+		if (!next_line)
+			return (ft_free(&rest_buffer), NULL);
+		temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
+		if (!temp)
+			return (free(next_line), ft_free(&rest_buffer), NULL);
+		return (free(rest_buffer), rest_buffer = temp, next_line);
 	}
-
 	buffer = malloc(BUFFER_SIZE + 1);
-	if (!buffer) {
-		if (rest_buffer) {
-			free(rest_buffer);
-			rest_buffer = NULL;
-		}
-		return NULL;
+	if (!buffer)
+	{
+		if (rest_buffer)
+			ft_free(&rest_buffer);
+		return (NULL);
 	}
-	
-	int read_result = read(fd, buffer, BUFFER_SIZE);
-	
-	if(read_result < 0) {
-		free(buffer);
-		if (rest_buffer) {
-			free(rest_buffer);
-			rest_buffer = NULL;
-		}
-		return NULL;
+	read_result = read(fd, buffer, BUFFER_SIZE);
+	if (read_result < 0)
+	{
+		if (rest_buffer)
+			ft_free(&rest_buffer);
+		return (free(buffer), NULL);
 	}
-
 	buffer[read_result] = '\0';
-
-	if(read_result == 0) {
-		if(rest_buffer && rest_buffer[0] != '\0') {
+	if (read_result == 0)
+	{
+		if (rest_buffer && rest_buffer[0] != '\0')
+		{
 			next_line = ft_strdup(rest_buffer);
-			if(!next_line) {
-				free(buffer);
-				free(rest_buffer);
-				rest_buffer = NULL;
-				return NULL;
-			}
-		} else {
-			next_line = NULL;
+			if (!next_line)
+				return (free(buffer), ft_free(&rest_buffer), NULL);
 		}
-		free(buffer);
-		free(rest_buffer);
-		rest_buffer = NULL;
-		return next_line;
+		else
+			next_line = NULL;
+		return (free(buffer), ft_free(&rest_buffer), next_line);
 	}
-
-	bool is_next_line_in_buffer = is_string_contain_character(buffer, '\n');
-	if (!is_next_line_in_buffer) {
-		
-		if (rest_buffer) {
-			char *temp = ft_strjoin(rest_buffer, buffer);
-			if(!temp) {
-				free(buffer);
-				free(rest_buffer);
-				rest_buffer = NULL;
-				return NULL;
-			}
+	if (!is_string_contain_character(buffer, '\n'))
+	{
+		if (rest_buffer)
+		{
+			temp = ft_strjoin(rest_buffer, buffer);
+			if (!temp)
+				return (free(buffer), ft_free(&rest_buffer), NULL);
 			free(rest_buffer);
 			rest_buffer = temp;
-		} else {
+		}
+		else
+		{
 			rest_buffer = ft_strdup(buffer);
-			if (!rest_buffer) {
-				free(buffer);
-				return NULL;
-			}
+			if (!rest_buffer)
+				return (free(buffer), NULL);
 		}
 		free(buffer);
-
 		if (!rest_buffer)
-			return NULL;
-
-		if(read_result < BUFFER_SIZE) {
-			next_line = rest_buffer;
-			rest_buffer = NULL;
-			return next_line;
-		}
-			
-		return get_next_line(fd);
+			return (NULL);
+		if (read_result < BUFFER_SIZE)
+			return (next_line = rest_buffer, rest_buffer = NULL, next_line);
+		return (get_next_line(fd));
 	}
-
 	next_line = line_before_character(buffer, '\n');
-	if (!next_line) {
-		free(buffer);
-		free(rest_buffer);
-		rest_buffer = NULL;
-		return NULL;
+	if (!next_line)
+		return (free(buffer), ft_free(&rest_buffer), NULL);
+	if (!rest_buffer)
+	{
+		dup = ft_strdup(ft_strchr(buffer, '\n'));
+		if (!dup)
+			return (free(next_line), free(buffer), NULL);
+		return (rest_buffer = dup, free(buffer), next_line);
 	}
-	
-	if(!rest_buffer) {
-		char *dup = ft_strdup(ft_strchr(buffer, '\n'));
-		if (!dup) {
-			free(next_line);
-			free(buffer);
-			return NULL;
-		}
-		rest_buffer = dup;
-		free(buffer);
-		return next_line;
-	}
-
-	char *old_next_line = next_line;
-	char *joined = ft_strjoin(rest_buffer, next_line);
-	if (!joined) {
-		free(old_next_line);
-		free(buffer);
-		free(rest_buffer);
-		rest_buffer = NULL;
-		return NULL;
-	}
+	old_next_line = next_line;
+	joined = ft_strjoin(rest_buffer, next_line);
+	if (!joined)
+		return (free(old_next_line), free(buffer), ft_free(&rest_buffer), NULL);
 	free(old_next_line);
-	char *dup = ft_strdup(ft_strchr(buffer, '\n'));
-	if (!dup) {
-		free(joined);
-		free(buffer);
-		free(rest_buffer);
-		rest_buffer = NULL;
-		return NULL;
-	}
-	free(rest_buffer);
-	rest_buffer = dup;
-	free(buffer);
-	return joined;
+	dup = ft_strdup(ft_strchr(buffer, '\n'));
+	if (!dup)
+		return (free(joined), free(buffer), ft_free(&rest_buffer), NULL);
+	return (free(rest_buffer), rest_buffer = dup, free(buffer), joined);
 }
+
 /**
  * @brief returns string before character included character
- * 
- * @param str 
- * @param c 
- * @return char* 
+ *
+ * @param str
+ * @param c
+ * @return char*
  * @warning dont forget to free
  */
-char *line_before_character(char *str, int c) {
-	int	i;
+char	*line_before_character(char *str, int c)
+{
+	int		i;
+	char	*result;
 
-	if(!str)
-		return NULL;
-
+	if (!str)
+		return (NULL);
 	i = 0;
 	while (str[i])
 	{
 		if (str[i] == (char)c)
 		{
-			char *result = malloc(i + 2);
-			if(!result)
-				return NULL;
+			result = malloc(i + 2);
+			if (!result)
+				return (NULL);
 			ft_strlcpy(result, str, i + 2);
-			return result;
+			return (result);
 		}
 		i++;
 	}
 	if (str[i] == (char)c)
-		return ft_strdup(str);
+		return (ft_strdup(str));
 	return (NULL);
 }
 
-bool is_string_contain_character(char *str, int c) {
-	int i = 0;
+bool	is_string_contain_character(char *str, int c)
+{
+	int	i;
 
-	if(!str)
-		return false;
-
-	while(str[i]) {
+	i = 0;
+	if (!str)
+		return (false);
+	while (str[i])
+	{
 		if (str[i] == (char)c)
-			return true;
+			return (true);
 		i++;
 	}
 	if (str[i] == (char)c)
 		return (true);
-	return false;
+	return (false);
 }
-
