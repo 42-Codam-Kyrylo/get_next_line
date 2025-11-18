@@ -44,6 +44,21 @@ char	*handle_buffer_new_line(char **next_line, char **buffer,
 	return (free(*rest_buffer), *rest_buffer = dup, free(*buffer), joined);
 }
 
+char	*handle_read_result0(char **rest_buffer, char **next_line,
+		char **buffer)
+{
+	if (*rest_buffer && *rest_buffer[0] != '\0')
+	{
+		*next_line = ft_strdup(*rest_buffer);
+		if (!*next_line)
+			return (free(*buffer), free(*rest_buffer), *rest_buffer = NULL,
+				NULL);
+	}
+	else
+		*next_line = NULL;
+	return (free(*buffer), free(*rest_buffer), *rest_buffer = NULL, *next_line);
+}
+
 char	*process_read(int fd, char **rest_buffer)
 {
 	char	*buffer;
@@ -67,19 +82,7 @@ char	*process_read(int fd, char **rest_buffer)
 	}
 	buffer[read_result] = '\0';
 	if (read_result == 0)
-	{
-		if (*rest_buffer && *rest_buffer[0] != '\0')
-		{
-			next_line = ft_strdup(*rest_buffer);
-			if (!next_line)
-				return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
-					NULL);
-		}
-		else
-			next_line = NULL;
-		return (free(buffer), free(*rest_buffer), *rest_buffer = NULL,
-			next_line);
-	}
+		return (handle_read_result0(rest_buffer, &next_line, &buffer));
 	if (!ft_strchr(buffer, '\n'))
 	{
 		if (*rest_buffer)
