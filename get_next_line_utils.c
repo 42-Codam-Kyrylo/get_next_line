@@ -104,3 +104,45 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	result[i + j] = '\0';
 	return (result);
 }
+/**
+ * @brief returns string before character included character
+ *
+ * @param str
+ * @param c
+ * @return char*
+ * @warning dont forget to free
+ */
+char	*line_before_character(char *str, int c)
+{
+	int		i;
+	int		j;
+	char	*result;
+
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (str[i] && str[i] != (char)c)
+		i++;
+	if (str[i] != (char)c)
+		return (NULL);
+	result = malloc(i + 2);
+	if (!result)
+		return (NULL);
+	j = 0;
+	while (j <= i)
+	{
+		result[j] = str[j];
+		j++;
+	}
+	result[j] = '\0';
+	return (result);
+}
+
+void	ft_free(char **str)
+{
+	if (str && *str)
+	{
+		free(*str);
+		*str = NULL;
+	}
+}
