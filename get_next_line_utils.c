@@ -13,19 +13,6 @@
 #include "get_next_line.h"
 #include <stdlib.h>
 
-void	ft_strlcpy(char *dst, const char *src, size_t size)
-{
-	size_t	i;
-
-	i = 0;
-	while (i < size - 1 && src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-}
-
 /**
  * @brief
  *
@@ -36,18 +23,23 @@ void	ft_strlcpy(char *dst, const char *src, size_t size)
 char	*ft_strdup(const char *s)
 {
 	char	*duplicate;
-	size_t	duplicate_len;
+	size_t	i;
 
-	duplicate_len = 0;
 	if (!s)
 		return (NULL);
-	while (s[duplicate_len])
-		duplicate_len++;
-	duplicate_len += 1;
-	duplicate = (char *)malloc(duplicate_len * sizeof(char));
-	if (duplicate == NULL)
+	i = 0;
+	while (s[i])
+		i++;
+	duplicate = (char *)malloc((i + 1) * sizeof(char));
+	if (!duplicate)
 		return (NULL);
-	ft_strlcpy(duplicate, s, duplicate_len);
+	i = 0;
+	while (s[i])
+	{
+		duplicate[i] = s[i];
+		i++;
+	}
+	duplicate[i] = '\0';
 	return (duplicate);
 }
 

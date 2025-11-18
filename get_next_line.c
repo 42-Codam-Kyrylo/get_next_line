@@ -137,24 +137,25 @@ char	*get_next_line(int fd)
 char	*line_before_character(char *str, int c)
 {
 	int		i;
+	int		j;
 	char	*result;
 
 	if (!str)
 		return (NULL);
 	i = 0;
-	while (str[i])
-	{
-		if (str[i] == (char)c)
-		{
-			result = malloc(i + 2);
-			if (!result)
-				return (NULL);
-			ft_strlcpy(result, str, i + 2);
-			return (result);
-		}
+	while (str[i] && str[i] != (char)c)
 		i++;
+	if (str[i] != (char)c)
+		return (NULL);
+	result = malloc(i + 2);
+	if (!result)
+		return (NULL);
+	j = 0;
+	while (j <= i)
+	{
+		result[j] = str[j];
+		j++;
 	}
-	if (str[i] == (char)c)
-		return (ft_strdup(str));
-	return (NULL);
+	result[j] = '\0';
+	return (result);
 }
