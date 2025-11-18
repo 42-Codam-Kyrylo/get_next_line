@@ -38,7 +38,7 @@ char	*get_next_line(int fd)
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (is_string_contain_character(rest_buffer, '\n'))
+	if (ft_strchr(rest_buffer, '\n'))
 	{
 		next_line = line_before_character(rest_buffer, '\n');
 		if (!next_line)
@@ -75,7 +75,7 @@ char	*get_next_line(int fd)
 			next_line = NULL;
 		return (free(buffer), ft_free(&rest_buffer), next_line);
 	}
-	if (!is_string_contain_character(buffer, '\n'))
+	if (!ft_strchr(buffer, '\n'))
 	{
 		if (rest_buffer)
 		{
@@ -150,22 +150,4 @@ char	*line_before_character(char *str, int c)
 	if (str[i] == (char)c)
 		return (ft_strdup(str));
 	return (NULL);
-}
-
-bool	is_string_contain_character(char *str, int c)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (false);
-	while (str[i])
-	{
-		if (str[i] == (char)c)
-			return (true);
-		i++;
-	}
-	if (str[i] == (char)c)
-		return (true);
-	return (false);
 }
