@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   get_next_line.h                                    :+:    :+:            */
+/*   get_next_line_bonus.h                              :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
-/*   Created: 2025/11/10 15:23:21 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/19 19:56:47 by kvolynsk      ########   odam.nl         */
+/*   Created: 2025/11/19 19:31:09 by kvolynsk      #+#    #+#                 */
+/*   Updated: 2025/11/19 19:56:26 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#ifndef GET_NEXT_LINE_BONUS_H
+# define GET_NEXT_LINE_BONUS_H
 
 # include <string.h>
 

@@ -1,40 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        ::::::::            */
-/*   get_next_line.c                                    :+:    :+:            */
+/*   get_next_line_bonus.c                              :+:    :+:            */
 /*                                                     +:+                    */
 /*   By: kvolynsk <kvolynsk@student.codam.nl>         +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2025/11/10 15:54:20 by kvolynsk      #+#    #+#                 */
-/*   Updated: 2025/11/19 19:56:19 by kvolynsk      ########   odam.nl         */
+/*   Updated: 2025/11/19 19:56:33 by kvolynsk      ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 #include <stdlib.h>
 #include <sys/select.h>
 #include <unistd.h>
 
 char	*get_next_line(int fd)
 {
-	static char	*rest_buffer;
+	static char	*rest_buffer[FD_SETSIZE];
 	char		*next_line;
 	char		*temp;
 
 	if (fd < 0 || fd >= FD_SETSIZE || BUFFER_SIZE <= 0)
 		return (NULL);
-	if (ft_strchr(rest_buffer, '\n'))
+	if (ft_strchr(rest_buffer[fd], '\n'))
 	{
-		next_line = line_before_character(rest_buffer, '\n');
+		next_line = line_before_character(rest_buffer[fd], '\n');
 		if (!next_line)
-			return (free(rest_buffer), rest_buffer = NULL, NULL);
-		temp = ft_strdup(ft_strchr(rest_buffer, '\n'));
+			return (free(rest_buffer[fd]), rest_buffer[fd] = NULL, NULL);
+		temp = ft_strdup(ft_strchr(rest_buffer[fd], '\n'));
 		if (!temp)
-			return (free(next_line), free(rest_buffer), rest_buffer = NULL,
-				NULL);
-		return (free(rest_buffer), rest_buffer = temp, next_line);
+			return (free(next_line), free(rest_buffer[fd]),
+				rest_buffer[fd] = NULL, NULL);
+		return (free(rest_buffer[fd]), rest_buffer[fd] = temp, next_line);
 	}
-	return (process_read(fd, &rest_buffer));
+	return (process_read(fd, &rest_buffer[fd]));
 }
 
 char	*handle_buffer_new_line(char **next_line, char **buffer,
