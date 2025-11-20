@@ -27,7 +27,6 @@ static int	print_streams_interleaved(int fd1, int fd2)
 	int		done1;
 	int		done2;
 	size_t	len;
-	size_t	len;
 
 	l1 = NULL;
 	l2 = NULL;
@@ -78,7 +77,6 @@ int	main(int argc, char **argv)
 	int	fd2;
 	int	rc;
 	int	fd;
-	int	rc;
 
 	if (argc >= 3)
 	{
